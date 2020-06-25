@@ -30,26 +30,28 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error'],
           message: inputSummary.error
         });
 
-        handleErrorAndSendNotification(e, 'getInputData');
-      }
+        if (mapSummary.error) {
+          var f = error.create({
+            name: 'Map_STAGE_FAILED',
+            message: mapSummary.error
+          });
 
-      handleErrorInStage('map', mapSummary);
+        handleErrorAndSendNotification(e, 'getInputData');
+        handleErrorAndSendNotification(f, 'Map');
+      }
     }
+  }
 
     function setAsNewCustomer(recordid) {
-      var customer = record.load({
-        type: customer,
-        id: recordid
-      });
-      var isNew = customer.getField({
-        fieldId: custentity24
-      });
-
       if (isNew == false) {
-        customer.setValue({
-          fieldId: custentity24,
-          value: true
+        var customer = record.submitFields({
+          type: record.Type.CUSTOMER,
+          id: recordid,
+          values: {
+            custentity24: true
+          }
         });
+
         log.debug(recordid + 'has been marked as a new customer');
 
       }
@@ -63,15 +65,7 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error'],
       return search.create({
         'type': search.Type.CUSTOMER,
         'filters': ['lastorderdate', search.Operator.NOTAFTER, 'same day last year'],
-        'columns': ['internalid', 'entityid', 'email', 'phone',
-          search.createColumn({
-            'date':'lastorderdate',
-            'sort':search.Sort.ASC
-          }),
-          search.createColumn({
-            'name':'tranid'
-          })
-        ]
+        'columns': ['internalid', 'entityid', 'email', 'phone', 'lastorderdate']
       });
     }
 
