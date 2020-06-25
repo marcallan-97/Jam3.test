@@ -31,23 +31,20 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error','N/query'],
         });
 
         handleErrorAndSendNotification(e, 'getInputData');
-        handleErrorAndSendNotification(f, 'Map');
       }
   }
 
     function setAsNewCustomer(recordid) {
-      if (isNew == false) {
+
         var customer = record.submitFields({
           type: record.Type.CUSTOMER,
           id: recordid,
           values: {
-            custentity24: true
+            'custentity24': true
           }
         });
 
-        log.debug(recordid + 'has been marked as a new customer');
-
-      }
+        log.debug(recordid, '  been marked as a new customer');
 
       customer.save();
     }
@@ -55,11 +52,9 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error','N/query'],
 
     function getInputData() {
       //Dynamically creates saved search to scan customer sales activity for the last 12 months
-      return search.create({
-        'type': search.Type.CUSTOMER,
-        'filters': ['ordereddate', search.Operator.NOTAFTER, query.RelativeDateRange.SAME_DAY_LAST_YEAR],
-        'columns': ['internalid', 'entityid', 'email', 'phone']
-      });
+        return search.load({
+          id: 'customsearch2311'
+        });
     }
 
     function map(context) {
