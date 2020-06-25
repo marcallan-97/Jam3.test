@@ -14,8 +14,8 @@
  *
  * ******************************************************************* */
 
-define(['N/search', 'N/record', 'N/runtime', 'N/error'],
-  function(search, record, runtime, error) {
+define(['N/search', 'N/record', 'N/runtime', 'N/error','N/query'],
+  function(search, record, runtime, error, query) {
     function handleErrorAndSendNotification(e, stage) {
       log.error('Stage: ' + stage + ' failed', e);
     }
@@ -30,16 +30,9 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error'],
           message: inputSummary.error
         });
 
-        if (mapSummary.error) {
-          var f = error.create({
-            name: 'Map_STAGE_FAILED',
-            message: mapSummary.error
-          });
-
         handleErrorAndSendNotification(e, 'getInputData');
         handleErrorAndSendNotification(f, 'Map');
       }
-    }
   }
 
     function setAsNewCustomer(recordid) {
@@ -64,8 +57,8 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error'],
       //Dynamically creates saved search to scan customer sales activity for the last 12 months
       return search.create({
         'type': search.Type.CUSTOMER,
-        'filters': ['lastorderdate', search.Operator.NOTAFTER, 'same day last year'],
-        'columns': ['internalid', 'entityid', 'email', 'phone', 'lastorderdate']
+        'filters': ['ordereddate', search.Operator.NOTAFTER, query.RelativeDateRange.SAME_DAY_LAST_YEAR],
+        'columns': ['internalid', 'entityid', 'email', 'phone']
       });
     }
 
