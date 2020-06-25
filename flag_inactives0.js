@@ -14,8 +14,8 @@
  *
  * ******************************************************************* */
 
-define(['N/search', 'N/record', 'N/runtime', 'N/error'],
-  function(search, record, runtime, error) {
+define(['N/search', 'N/record', 'N/runtime', 'N/error','N/query'],
+  function(search, record, runtime, error, query) {
     function handleErrorAndSendNotification(e, stage) {
       log.error('Stage: ' + stage + ' failed', e);
     }
@@ -32,27 +32,19 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error'],
 
         handleErrorAndSendNotification(e, 'getInputData');
       }
-
-      handleErrorInStage('map', mapSummary);
-    }
+  }
 
     function setAsNewCustomer(recordid) {
-      var customer = record.load({
-        type: customer,
-        id: recordid
-      });
-      var isNew = customer.getField({
-        fieldId: custentity24
-      });
 
-      if (isNew == false) {
-        customer.setValue({
-          fieldId: custentity24,
-          value: true
+        var customer = record.submitFields({
+          type: record.Type.CUSTOMER,
+          id: recordid,
+          values: {
+            'custentity24': true
+          }
         });
-        log.debug(recordid + 'has been marked as a new customer');
 
-      }
+        log.debug(recordid, '  been marked as a new customer');
 
       customer.save();
     }
@@ -60,19 +52,9 @@ define(['N/search', 'N/record', 'N/runtime', 'N/error'],
 
     function getInputData() {
       //Dynamically creates saved search to scan customer sales activity for the last 12 months
-      return search.create({
-        'type': search.Type.CUSTOMER,
-        'filters': ['lastorderdate', search.Operator.NOTAFTER, 'same day last year'],
-        'columns': ['internalid', 'entityid', 'email', 'phone',
-          search.createColumn({
-            'date':'lastorderdate',
-            'sort':search.Sort.ASC
-          }),
-          search.createColumn({
-            'name':'tranid'
-          })
-        ]
-      });
+        return search.load({
+          id: 'customsearch2311'
+        });
     }
 
     function map(context) {
